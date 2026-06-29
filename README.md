@@ -47,7 +47,11 @@ Trong mô hình này:
 2. **Copy executable vào thư mục Plugin:**
    Copy file thực thi vừa build vào thư mục `ainovel-plugin`.
    ```bash
+   # Trên Windows
    cp ainovel-mcp.exe ainovel-plugin/
+
+   # Trên Linux / macOS
+   cp ainovel-mcp ainovel-plugin/
    ```
 
 3. **Đăng ký Plugin vào Antigravity:**
@@ -57,13 +61,27 @@ Trong mô hình này:
    ```
 
 4. **Cấu hình đường dẫn MCP:**
-   Mở file `~/.gemini/config/plugins/ainovel-plugin/mcp_config.json` và sửa trường `command` trỏ tới đường dẫn tuyệt đối của file thực thi `ainovel-mcp.exe`.
-   Ví dụ trên Windows:
+   Mở file `~/.gemini/config/plugins/ainovel-plugin/mcp_config.json` và sửa trường `command` trỏ tới đường dẫn tuyệt đối của file thực thi vừa build.
+   
+   **Ví dụ trên Windows:**
    ```json
    {
      "mcpServers": {
        "ainovel-mcp": {
          "command": "C:\\Users\\<YourUser>\\.gemini\\config\\plugins\\ainovel-plugin\\ainovel-mcp.exe",
+         "args": [],
+         "env": {}
+       }
+     }
+   }
+   ```
+
+   **Ví dụ trên macOS / Linux:**
+   ```json
+   {
+     "mcpServers": {
+       "ainovel-mcp": {
+         "command": "/Users/<YourUser>/.gemini/config/plugins/ainovel-plugin/ainovel-mcp",
          "args": [],
          "env": {}
        }
