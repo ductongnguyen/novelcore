@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"slices"
 
-	"github.com/voocel/agentcore/schema"
-	agentcoretools "github.com/voocel/agentcore/tools"
+	"strings"
+
 	"github.com/voocel/ainovel-cli/internal/domain"
 	"github.com/voocel/ainovel-cli/internal/errs"
 	"github.com/voocel/ainovel-cli/internal/store"
@@ -20,17 +20,14 @@ import (
 // Seed 语义：drafts 不存在但 chapters 有 → 自动把 chapters 复制到 drafts 作为起点。
 // 归属检查：章节已完成时必须在 PendingRewrites 队列中，否则拒绝。
 //
-// 本工具是 agentcore.EditTool 的薄封装，找-换逻辑（多级容错匹配、diff 输出、行尾/BOM 保留）
-// 全部复用上游实现。
+// EditChapterTool 对草稿进行简单的找-换。
 type EditChapterTool struct {
 	store *store.Store
-	edit  *agentcoretools.EditTool
 }
 
 func NewEditChapterTool(s *store.Store) *EditChapterTool {
 	return &EditChapterTool{
 		store: s,
-		edit:  agentcoretools.NewEdit(s.Dir(), nil),
 	}
 }
 
@@ -54,14 +51,14 @@ func (t *EditChapterTool) Description() string {
 		"章节已完成且不在 PendingRewrites 队列中时拒绝执行。每次调用只改一处，多处修改请多次调用。"
 }
 
-func (t *EditChapterTool) Schema() map[string]any {
-	return schema.Object(
-		schema.Property("chapter", schema.Int("章节号")).Required(),
-		schema.Property("old_string", schema.String("要替换的原文精确片段，多行需包含换行；不加 replace_all 时必须在草稿中唯一出现")).Required(),
-		schema.Property("new_string", schema.String("替换后的新文本")).Required(),
-		schema.Property("replace_all", schema.Bool("替换所有匹配（默认 false）")),
-	)
-}
+// func (t *EditChapterTool) Schema() map[string]any {
+// 	return schema.Object(
+// 		schema.Property("chapter", schema.Int("章节号")).Required(),
+// 		schema.Property("old_string", schema.String("要替换的原文精确片段，多行需包含换行；不加 replace_all 时必须在草稿中唯一出现")).Required(),
+// 		schema.Property("new_string", schema.String("替换后的新文本")).Required(),
+// 		schema.Property("replace_all", schema.Bool("替换所有匹配（默认 false）")),
+// 	)
+// }
 
 func (t *EditChapterTool) Execute(ctx context.Context, args json.RawMessage) (json.RawMessage, error) {
 	var a struct {
@@ -96,19 +93,28 @@ func (t *EditChapterTool) Execute(ctx context.Context, args json.RawMessage) (js
 		return nil, err
 	}
 
-	// 委托 agentcore.EditTool 完成找-换
-	subArgs, _ := json.Marshal(map[string]any{
-		"path":        fmt.Sprintf("drafts/%02d.draft.md", a.Chapter),
-		"file_path":   fmt.Sprintf("drafts/%02d.draft.md", a.Chapter),
-		"old_text":    a.OldString,
-		"old_string":  a.OldString,
-		"new_text":    a.NewString,
-		"new_string":  a.NewString,
-		"replace_all": a.ReplaceAll,
-	})
-	result, err := t.edit.Execute(ctx, subArgs)
+	draftText, err := t.store.Drafts.LoadDraft(a.Chapter)
 	if err != nil {
-		return nil, fmt.Errorf("apply edit: %w: %w", errs.ErrToolPrecondition, err)
+		return nil, err
+	}
+
+	if !strings.Contains(draftText, a.OldString) {
+		return nil, fmt.Errorf("old_string not found in draft")
+	}
+
+	if !a.ReplaceAll && strings.Count(draftText, a.OldString) > 1 {
+		return nil, fmt.Errorf("old_string appears multiple times, use replace_all=true")
+	}
+
+	var newDraft string
+	if a.ReplaceAll {
+		newDraft = strings.ReplaceAll(draftText, a.OldString, a.NewString)
+	} else {
+		newDraft = strings.Replace(draftText, a.OldString, a.NewString, 1)
+	}
+
+	if err := t.store.Drafts.SaveDraft(a.Chapter, newDraft); err != nil {
+		return nil, err
 	}
 
 	if _, err := t.store.Checkpoints.AppendArtifact(
@@ -118,13 +124,10 @@ func (t *EditChapterTool) Execute(ctx context.Context, args json.RawMessage) (js
 		return nil, fmt.Errorf("checkpoint edit: %w: %w", errs.ErrStoreWrite, err)
 	}
 
-	// 附加指引：让 writer 知道后续步骤，避免遗漏 check_consistency / commit_chapter
-	var passthrough map[string]any
-	if err := json.Unmarshal(result, &passthrough); err != nil {
-		return result, nil
+	passthrough := map[string]any{
+		"chapter": a.Chapter,
+		"next_step": "edit 已落盘。仍有硬伤可再次 edit_chapter；否则 check_consistency 后 commit_chapter",
 	}
-	passthrough["chapter"] = a.Chapter
-	passthrough["next_step"] = "edit 已落盘。仍有硬伤可再次 edit_chapter；否则 check_consistency 后 commit_chapter"
 	return json.Marshal(passthrough)
 }
 

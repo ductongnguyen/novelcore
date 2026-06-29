@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/voocel/agentcore/schema"
+	
 	"github.com/voocel/ainovel-cli/internal/domain"
 	"github.com/voocel/ainovel-cli/internal/errs"
 	"github.com/voocel/ainovel-cli/internal/store"
@@ -31,11 +31,11 @@ func (t *CheckConsistencyTool) Label() string { return "一致性检查" }
 func (t *CheckConsistencyTool) ReadOnly(_ json.RawMessage) bool        { return true }
 func (t *CheckConsistencyTool) ConcurrencySafe(_ json.RawMessage) bool { return true }
 
-func (t *CheckConsistencyTool) Schema() map[string]any {
-	return schema.Object(
-		schema.Property("chapter", schema.Int("要检查的章节号")).Required(),
-	)
-}
+// func (t *CheckConsistencyTool) Schema() map[string]any {
+// 	return schema.Object(
+// 		schema.Property("chapter", schema.Int("要检查的章节号")).Required(),
+// 	)
+// }
 
 func (t *CheckConsistencyTool) Execute(_ context.Context, args json.RawMessage) (json.RawMessage, error) {
 	var a struct {

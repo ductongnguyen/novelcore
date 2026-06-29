@@ -24,7 +24,6 @@ type Store struct {
 	Cast        *CastStore
 	World       *WorldStore
 	Checkpoints *CheckpointStore
-	Sessions    *SessionStore
 	Usage       *UsageStore
 	Simulation  *SimulationStore
 
@@ -49,7 +48,6 @@ func NewStore(dir string) *Store {
 		Cast:        NewCastStore(newIO(dir)),
 		World:       NewWorldStore(newIO(dir)),
 		Checkpoints: NewCheckpointStore(io),
-		Sessions:    NewSessionStore(newIO(dir)),
 		Usage:       NewUsageStore(newIO(dir)),
 		Simulation:  NewSimulationStore(newIO(dir)),
 	}

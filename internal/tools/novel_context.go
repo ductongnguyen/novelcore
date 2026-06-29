@@ -8,7 +8,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/voocel/agentcore/schema"
+	
 	"github.com/voocel/ainovel-cli/internal/domain"
 	"github.com/voocel/ainovel-cli/internal/store"
 )
@@ -59,11 +59,11 @@ func (t *ContextTool) Label() string { return "加载上下文" }
 func (t *ContextTool) ReadOnly(_ json.RawMessage) bool        { return true }
 func (t *ContextTool) ConcurrencySafe(_ json.RawMessage) bool { return true }
 
-func (t *ContextTool) Schema() map[string]any {
-	return schema.Object(
-		schema.Property("chapter", schema.Int("章节号。不传则返回进度状态和基础设定（Coordinator 用于判断下一步）；传入则额外返回该章的写作上下文（Writer 用）")),
-	)
-}
+// func (t *ContextTool) Schema() map[string]any {
+// 	return schema.Object(
+// 		schema.Property("chapter", schema.Int("章节号。不传则返回进度状态和基础设定（Coordinator 用于判断下一步）；传入则额外返回该章的写作上下文（Writer 用）")),
+// 	)
+// }
 
 func (t *ContextTool) Execute(_ context.Context, args json.RawMessage) (json.RawMessage, error) {
 	var a struct {

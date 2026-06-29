@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"slices"
 
-	"github.com/voocel/agentcore/schema"
+	
 	"github.com/voocel/ainovel-cli/internal/domain"
 	"github.com/voocel/ainovel-cli/internal/errs"
 	"github.com/voocel/ainovel-cli/internal/store"
@@ -40,12 +40,12 @@ func (t *ReopenBookTool) ConcurrencySafe(_ json.RawMessage) bool { return false 
 
 func (t *ReopenBookTool) ActivityDescription(_ json.RawMessage) string { return "重新打开全书返工" }
 
-func (t *ReopenBookTool) Schema() map[string]any {
-	return schema.Object(
-		schema.Property("chapters", schema.Array("要返工的已完成章节号列表（至少一章）", schema.Int(""))).Required(),
-		schema.Property("reason", schema.String("返工原因（可选，如\"清理特殊字符\"）")),
-	)
-}
+// func (t *ReopenBookTool) Schema() map[string]any {
+// 	return schema.Object(
+// 		schema.Property("chapters", schema.Array("要返工的已完成章节号列表（至少一章）", schema.Int(""))).Required(),
+// 		schema.Property("reason", schema.String("返工原因（可选，如\"清理特殊字符\"）")),
+// 	)
+// }
 
 func (t *ReopenBookTool) Execute(_ context.Context, args json.RawMessage) (json.RawMessage, error) {
 	var a struct {

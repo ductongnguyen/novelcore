@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/voocel/agentcore/schema"
+	
 	"github.com/voocel/ainovel-cli/internal/store"
 )
 
@@ -29,16 +29,16 @@ func (t *ReadChapterTool) Label() string { return "读取章节" }
 func (t *ReadChapterTool) ReadOnly(_ json.RawMessage) bool        { return true }
 func (t *ReadChapterTool) ConcurrencySafe(_ json.RawMessage) bool { return true }
 
-func (t *ReadChapterTool) Schema() map[string]any {
-	return schema.Object(
-		schema.Property("chapter", schema.Int("章节号（读单章时必填）")),
-		schema.Property("from", schema.Int("起始章节号（读范围时使用）")),
-		schema.Property("to", schema.Int("结束章节号（读范围时使用）")),
-		schema.Property("source", schema.Enum("来源", "final", "draft")).Required(),
-		schema.Property("character", schema.String("角色名（提取对话片段时使用）")),
-		schema.Property("max_runes", schema.Int("每章最大字符数（范围读取时截取，默认 2000）")),
-	)
-}
+// func (t *ReadChapterTool) Schema() map[string]any {
+// 	return schema.Object(
+// 		schema.Property("chapter", schema.Int("章节号（读单章时必填）")),
+// 		schema.Property("from", schema.Int("起始章节号（读范围时使用）")),
+// 		schema.Property("to", schema.Int("结束章节号（读范围时使用）")),
+// 		schema.Property("source", schema.Enum("来源", "final", "draft")).Required(),
+// 		schema.Property("character", schema.String("角色名（提取对话片段时使用）")),
+// 		schema.Property("max_runes", schema.Int("每章最大字符数（范围读取时截取，默认 2000）")),
+// 	)
+// }
 
 func (t *ReadChapterTool) Execute(_ context.Context, args json.RawMessage) (json.RawMessage, error) {
 	var a struct {

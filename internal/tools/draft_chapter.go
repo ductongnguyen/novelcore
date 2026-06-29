@@ -7,7 +7,7 @@ import (
 	"slices"
 	"unicode/utf8"
 
-	"github.com/voocel/agentcore/schema"
+	
 	"github.com/voocel/ainovel-cli/internal/domain"
 	"github.com/voocel/ainovel-cli/internal/errs"
 	"github.com/voocel/ainovel-cli/internal/store"
@@ -33,16 +33,16 @@ func (t *DraftChapterTool) Label() string { return "写入章节" }
 func (t *DraftChapterTool) ReadOnly(_ json.RawMessage) bool        { return false }
 func (t *DraftChapterTool) ConcurrencySafe(_ json.RawMessage) bool { return false }
 
-func (t *DraftChapterTool) Schema() map[string]any {
-	// mode 标 required 是为了兼容 OpenAI strict tool calling——strict 模式
-	// 要求所有 properties 都在 required 列表中。原来的"省略 mode 走 write
-	// 默认"行为现在需要模型显式传 mode="write"，Execute 的 default 分支不变。
-	return schema.Object(
-		schema.Property("chapter", schema.Int("章节号")).Required(),
-		schema.Property("content", schema.String("章节正文")).Required(),
-		schema.Property("mode", schema.Enum("写入模式", "write", "append")).Required(),
-	)
-}
+// func (t *DraftChapterTool) Schema() map[string]any {
+// 	// mode 标 required 是为了兼容 OpenAI strict tool calling——strict 模式
+// 	// 要求所有 properties 都在 required 列表中。原来的"省略 mode 走 write
+// 	// 默认"行为现在需要模型显式传 mode="write"，Execute 的 default 分支不变。
+// 	return schema.Object(
+// 		schema.Property("chapter", schema.Int("章节号")).Required(),
+// 		schema.Property("content", schema.String("章节正文")).Required(),
+// 		schema.Property("mode", schema.Enum("写入模式", "write", "append")).Required(),
+// 	)
+// }
 
 // StrictSchema 启用 OpenAI 的 strict tool calling，让模型必须严格遵守
 // schema：所有 required 字段必填，arguments 不能"提前 EOT"出现空对象。

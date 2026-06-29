@@ -9,7 +9,7 @@ import (
 	"slices"
 	"time"
 
-	"github.com/voocel/agentcore/schema"
+	
 	"github.com/voocel/ainovel-cli/internal/domain"
 	"github.com/voocel/ainovel-cli/internal/errs"
 	"github.com/voocel/ainovel-cli/internal/rules"
@@ -43,52 +43,52 @@ func (t *CommitChapterTool) Label() string { return "提交章节" }
 func (t *CommitChapterTool) ReadOnly(_ json.RawMessage) bool        { return false }
 func (t *CommitChapterTool) ConcurrencySafe(_ json.RawMessage) bool { return false }
 
-func (t *CommitChapterTool) Schema() map[string]any {
-	timelineSchema := schema.Object(
-		schema.Property("time", schema.String("故事内时间")).Required(),
-		schema.Property("event", schema.String("事件描述")).Required(),
-		schema.Property("characters", schema.Array("涉及角色", schema.String(""))),
-	)
-	foreshadowSchema := schema.Object(
-		schema.Property("id", schema.String("伏笔 ID")).Required(),
-		schema.Property("action", schema.Enum("操作", "plant", "advance", "resolve")).Required(),
-		schema.Property("description", schema.String("伏笔描述（仅 plant 时必需）")),
-	)
-	relationshipSchema := schema.Object(
-		schema.Property("character_a", schema.String("角色 A")).Required(),
-		schema.Property("character_b", schema.String("角色 B")).Required(),
-		schema.Property("relation", schema.String("当前关系描述")).Required(),
-	)
-	stateChangeSchema := schema.Object(
-		schema.Property("entity", schema.String("角色名或实体名")).Required(),
-		schema.Property("field", schema.String("变化属性")).Required(),
-		schema.Property("old_value", schema.String("变化前的值")),
-		schema.Property("new_value", schema.String("变化后的值")).Required(),
-		schema.Property("reason", schema.String("变化原因")),
-	)
-	feedbackSchema := schema.Object(
-		schema.Property("deviation", schema.String("偏离大纲的描述")).Required(),
-		schema.Property("suggestion", schema.String("对后续大纲的调整建议")).Required(),
-	)
-	feedbackSchema["description"] = "对后续大纲的建议对象；必须直接传 JSON object，不要传字符串化 JSON"
-	return schema.Object(
-		schema.Property("chapter", schema.Int("章节号")).Required(),
-		schema.Property("summary", schema.String("本章内容摘要（200字以内）")).Required(),
-		schema.Property("characters", schema.Array("本章出场角色名", schema.String(""))).Required(),
-		schema.Property("key_events", schema.Array("本章关键事件", schema.String(""))).Required(),
-		schema.Property("timeline_events", schema.Array("本章时间线事件", timelineSchema)),
-		schema.Property("foreshadow_updates", schema.Array("伏笔操作", foreshadowSchema)),
-		schema.Property("relationship_changes", schema.Array("关系变化", relationshipSchema)),
-		schema.Property("state_changes", schema.Array("角色/实体状态变化", stateChangeSchema)),
-		schema.Property("cast_intros", schema.Array("本章首次引入且后续可能再出现的次要角色简介（不含主角及 characters.json 已有角色）", schema.Object(
-			schema.Property("name", schema.String("角色名")).Required(),
-			schema.Property("brief_role", schema.String("一句话定位（如：客栈老板/赌坊打手）")).Required(),
-		))),
-		schema.Property("hook_type", schema.Enum("章末钩子类型", "crisis", "mystery", "desire", "emotion", "choice")),
-		schema.Property("dominant_strand", schema.Enum("本章主导叙事线", "quest", "fire", "constellation")),
-		schema.Property("feedback", feedbackSchema),
-	)
-}
+// func (t *CommitChapterTool) Schema() map[string]any {
+// 	timelineSchema := schema.Object(
+// 		schema.Property("time", schema.String("故事内时间")).Required(),
+// 		schema.Property("event", schema.String("事件描述")).Required(),
+// 		schema.Property("characters", schema.Array("涉及角色", schema.String(""))),
+// 	)
+// 	foreshadowSchema := schema.Object(
+// 		schema.Property("id", schema.String("伏笔 ID")).Required(),
+// 		schema.Property("action", schema.Enum("操作", "plant", "advance", "resolve")).Required(),
+// 		schema.Property("description", schema.String("伏笔描述（仅 plant 时必需）")),
+// 	)
+// 	relationshipSchema := schema.Object(
+// 		schema.Property("character_a", schema.String("角色 A")).Required(),
+// 		schema.Property("character_b", schema.String("角色 B")).Required(),
+// 		schema.Property("relation", schema.String("当前关系描述")).Required(),
+// 	)
+// 	stateChangeSchema := schema.Object(
+// 		schema.Property("entity", schema.String("角色名或实体名")).Required(),
+// 		schema.Property("field", schema.String("变化属性")).Required(),
+// 		schema.Property("old_value", schema.String("变化前的值")),
+// 		schema.Property("new_value", schema.String("变化后的值")).Required(),
+// 		schema.Property("reason", schema.String("变化原因")),
+// 	)
+// 	feedbackSchema := schema.Object(
+// 		schema.Property("deviation", schema.String("偏离大纲的描述")).Required(),
+// 		schema.Property("suggestion", schema.String("对后续大纲的调整建议")).Required(),
+// 	)
+// 	feedbackSchema["description"] = "对后续大纲的建议对象；必须直接传 JSON object，不要传字符串化 JSON"
+// 	return schema.Object(
+// 		schema.Property("chapter", schema.Int("章节号")).Required(),
+// 		schema.Property("summary", schema.String("本章内容摘要（200字以内）")).Required(),
+// 		schema.Property("characters", schema.Array("本章出场角色名", schema.String(""))).Required(),
+// 		schema.Property("key_events", schema.Array("本章关键事件", schema.String(""))).Required(),
+// 		schema.Property("timeline_events", schema.Array("本章时间线事件", timelineSchema)),
+// 		schema.Property("foreshadow_updates", schema.Array("伏笔操作", foreshadowSchema)),
+// 		schema.Property("relationship_changes", schema.Array("关系变化", relationshipSchema)),
+// 		schema.Property("state_changes", schema.Array("角色/实体状态变化", stateChangeSchema)),
+// 		schema.Property("cast_intros", schema.Array("本章首次引入且后续可能再出现的次要角色简介（不含主角及 characters.json 已有角色）", schema.Object(
+// 			schema.Property("name", schema.String("角色名")).Required(),
+// 			schema.Property("brief_role", schema.String("一句话定位（如：客栈老板/赌坊打手）")).Required(),
+// 		))),
+// 		schema.Property("hook_type", schema.Enum("章末钩子类型", "crisis", "mystery", "desire", "emotion", "choice")),
+// 		schema.Property("dominant_strand", schema.Enum("本章主导叙事线", "quest", "fire", "constellation")),
+// 		schema.Property("feedback", feedbackSchema),
+// 	)
+// }
 
 func (t *CommitChapterTool) Execute(_ context.Context, args json.RawMessage) (json.RawMessage, error) {
 	var a struct {

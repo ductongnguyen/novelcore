@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "ainovel-mcp": {
+      "command": "ainovel-mcp",
+      "args": [],
+      "env": {}
+    }
+  }
+}
