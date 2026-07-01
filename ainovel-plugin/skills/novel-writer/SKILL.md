@@ -46,6 +46,33 @@ When the user asks you to write a story or a chapter, **DO NOT jump straight int
 9. **Corrections**:
    - Use `novel.reopen_book` if the user wants to go back and fix an already completed chapter or arc.
 
+### Context Management (Quản lý Ngữ cảnh)
+
+To successfully write a long-running novel without losing track of details or blowing up the LLM token limit, you MUST master layered context management:
+1. **Rolling Context**: Do not try to remember everything. Rely on `novel.novel_context` to provide a curated summary of the story so far before planning new chapters.
+2. **Foreshadowing (Cài cắm - 伏笔)**: Whenever you introduce a mystery, a hidden motive, or an unresolved plot point, you MUST make sure it is recorded in the Arc Summary so it isn't forgotten.
+3. **Character States**: Track significant changes to characters (e.g., power-ups, injuries, relationship shifts, new items) and update them in the Foundation (`novel.save_foundation` type="character") or note them in the Arc Summary.
+4. **Layered Summarization**: 
+   - *Arc Level*: Once an arc (mạch truyện) concludes, use `novel.save_arc_summary` to compress all events of those chapters into a dense summary. Include major plot progression, character arcs resolved, and unresolved foreshadowing.
+   - *Volume Level*: When a volume (tập) ends, use `novel.save_volume_summary` to compress multiple arcs into an overarching summary.
+5. **Efficiency**: Avoid using `novel.read_chapter` unless you absolutely need the exact phrasing of a past event. Summaries are your primary source of truth.
+
+### Advanced Strategies (Chiến lược Nâng cao)
+To mimic the full power of a multi-agent CLI system, you must follow these operational strategies:
+1. **Rolling Planning (Quy hoạch "cuộn")**: 
+   - DO NOT try to generate a detailed chapter-by-chapter outline for the entire novel at once. 
+   - In the Architect phase, only create a high-level framework for Volumes and Arcs.
+   - Detail the chapter-by-chapter plan ONLY for the immediate upcoming chapters (e.g., next 1-3 chapters). Expand the plan dynamically as you write.
+2. **Checkpoint & Resume (Khôi phục sự cố)**: 
+   - The MCP tools automatically save state to disk. If a conversation is interrupted or the user says "continue", your very first action MUST be `novel.status` to determine exactly where you left off. 
+   - Resume the workflow exactly from that step (e.g., if we stopped at a draft, proceed to review; if at commit, proceed to plan next). Do not rewrite what is already committed unless requested.
+3. **Handling Direct Intervention (Can thiệp trực tiếp)**: 
+   - If the user provides manual feedback or new ideas, first **evaluate the blast radius** (phạm vi ảnh hưởng).
+   - In Architect/Planning Phase? -> ONLY update the foundation or plan (`novel.save_foundation` or `novel.plan_chapter`). DO NOT draft text yet. Wait for user approval on the revised idea.
+   - Affects current draft? -> Edit it using `novel.edit_chapter`.
+   - Affects committed chapters? -> Use `novel.reopen_book` to unlock, rewrite, and re-commit.
+   - Alters world rules/characters? -> Use `novel.save_foundation` to update the core settings.
+
 ### Tips
 - You are responsible for generating the actual creative text of the novel. Be highly creative, engaging, and consistent.
 - The `ainovel-mcp` tools only manage state, file saving, and basic validation. YOU must do the heavy lifting of writing and editing.
