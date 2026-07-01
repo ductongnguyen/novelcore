@@ -45,8 +45,8 @@ When the user asks you to write a story or a chapter, **DO NOT jump straight int
    - Use `novel.export` to export the entire novel into a single markdown/text file for the user to read.
    - Use `novel.import` to load a previously exported text file back into the project state.
 
-9. **Corrections**:
-   - Use `novel.reopen_book` if the user wants to go back and fix an already completed chapter or arc.
+9. **Corrections (Requires User Approval)**:
+   - Use `novel.reopen_book` if the user wants to go back and fix an already completed chapter or arc. After rewriting, ALWAYS ask for user approval before calling `novel.commit_chapter` again.
 
 ### Context Management (Quản lý Ngữ cảnh)
 
@@ -72,7 +72,7 @@ To mimic the full power of a multi-agent CLI system, you must follow these opera
    - If the user provides manual feedback or new ideas, first **evaluate the blast radius** (phạm vi ảnh hưởng).
    - In Architect/Planning Phase? -> ONLY update the foundation or plan (`novel.save_foundation` or `novel.plan_chapter`). DO NOT draft text yet. Wait for user approval on the revised idea.
    - Affects current draft? -> Edit it using `novel.edit_chapter`.
-   - Affects committed chapters? -> Use `novel.reopen_book` to unlock, rewrite, and re-commit.
+   - Affects committed chapters? -> Use `novel.reopen_book` to unlock and rewrite. ALWAYS ask for user approval before re-committing.
    - Alters world rules/characters? -> Use `novel.save_foundation` to update the core settings.
 
 ### Tips
