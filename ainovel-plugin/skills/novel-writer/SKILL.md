@@ -31,8 +31,10 @@ When the user asks you to write a story or a chapter, **DO NOT jump straight int
    - Use `novel.check_consistency` to run an automatic review of the current drafted chapter to identify plot holes, character inconsistencies, or pacing issues.
    - Based on the review, use `novel.edit_chapter` to submit the corrected, final text for the chapter.
 
-6. **Finalize Chapter**:
-   - Use `novel.commit_chapter` when the chapter is fully written and edited. This finalizes the chapter and increments the chapter counter.
+6. **Finalize Chapter (Requires User Approval)**:
+   - After the draft is fully written and edited, DO NOT call `novel.commit_chapter` automatically.
+   - You MUST stop, present the completed text to the user, and ask: "Do you want to commit this chapter?".
+   - Only use `novel.commit_chapter` AFTER receiving explicit user approval. This finalizes the chapter and increments the chapter counter.
 
 7. **Summarizing (Arc & Volume)**:
    - Use `novel.save_arc_summary` after completing a set of chapters that form an arc.
