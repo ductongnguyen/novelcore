@@ -19,8 +19,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	// We initialize a new novel store at CWD
-	novelStore := store.NewStore(cwd)
+	// We initialize a new novel store manager with CWD as default
+	storeManager := store.NewStoreManager(cwd)
 
 	// Create MCP server
 	mcpServer := server.NewMCPServer(
@@ -30,7 +30,7 @@ func main() {
 	)
 
 	// Register tools
-	mcp.RegisterTools(mcpServer, novelStore)
+	mcp.RegisterTools(mcpServer, storeManager)
 
 	// Start the stdio server
 	if err := server.ServeStdio(mcpServer); err != nil {

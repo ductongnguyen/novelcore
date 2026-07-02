@@ -10,10 +10,13 @@ import (
 	"github.com/voocel/ainovel-cli/internal/tools"
 )
 
-func RegisterTools(s *server.MCPServer, store *store.Store) {
+func RegisterTools(s *server.MCPServer, storeManager *store.StoreManager) {
 	s.AddTool(mcp.NewTool("novel.status",
 		mcp.WithDescription("Get the current status of the novel project"),
+		mcp.WithString("project_dir", mcp.Description("Optional absolute path to the novel directory. Defaults to CWD.")),
 	), func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+		dir, _ := request.Params.Arguments["project_dir"].(string)
+		store := storeManager.GetStore(dir)
 		state, _ := store.Progress.Load()
 		var phase, flow string
 		if state != nil {
@@ -32,6 +35,8 @@ func RegisterTools(s *server.MCPServer, store *store.Store) {
 		mcp.WithDescription("Executes novel.check_consistency"),
 		mcp.WithNumber("chapter", mcp.Description("chapter")),
 	), func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+		dir, _ := request.Params.Arguments["project_dir"].(string)
+		store := storeManager.GetStore(dir)
 		argsRaw, _ := json.Marshal(request.Params.Arguments)
 		f := tools.NewCheckConsistencyTool(store)
 		res, err := f.Execute(ctx, argsRaw)
@@ -56,6 +61,8 @@ func RegisterTools(s *server.MCPServer, store *store.Store) {
 		mcp.WithString("dominant_strand", mcp.Description("dominant_strand")),
 		mcp.WithString("feedback", mcp.Description("feedback")),
 	), func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+		dir, _ := request.Params.Arguments["project_dir"].(string)
+		store := storeManager.GetStore(dir)
 		argsRaw, _ := json.Marshal(request.Params.Arguments)
 		f := tools.NewCommitChapterTool(store)
 		res, err := f.Execute(ctx, argsRaw)
@@ -71,6 +78,8 @@ func RegisterTools(s *server.MCPServer, store *store.Store) {
 		mcp.WithString("content", mcp.Description("content")),
 		mcp.WithString("mode", mcp.Description("mode")),
 	), func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+		dir, _ := request.Params.Arguments["project_dir"].(string)
+		store := storeManager.GetStore(dir)
 		argsRaw, _ := json.Marshal(request.Params.Arguments)
 		f := tools.NewDraftChapterTool(store)
 		res, err := f.Execute(ctx, argsRaw)
@@ -87,6 +96,8 @@ func RegisterTools(s *server.MCPServer, store *store.Store) {
 		mcp.WithString("new_string", mcp.Description("new_string")),
 		mcp.WithBoolean("replace_all", mcp.Description("replace_all")),
 	), func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+		dir, _ := request.Params.Arguments["project_dir"].(string)
+		store := storeManager.GetStore(dir)
 		argsRaw, _ := json.Marshal(request.Params.Arguments)
 		f := tools.NewEditChapterTool(store)
 		res, err := f.Execute(ctx, argsRaw)
@@ -100,6 +111,8 @@ func RegisterTools(s *server.MCPServer, store *store.Store) {
 		mcp.WithDescription("Executes novel.novel_context"),
 		mcp.WithNumber("chapter", mcp.Description("chapter")),
 	), func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+		dir, _ := request.Params.Arguments["project_dir"].(string)
+		store := storeManager.GetStore(dir)
 		argsRaw, _ := json.Marshal(request.Params.Arguments)
 		f := tools.NewContextTool(store, tools.References{}, "")
 		res, err := f.Execute(ctx, argsRaw)
@@ -126,6 +139,8 @@ func RegisterTools(s *server.MCPServer, store *store.Store) {
 		mcp.WithString("payoff_points", mcp.Description("payoff_points")),
 		mcp.WithString("hook_goal", mcp.Description("hook_goal")),
 	), func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+		dir, _ := request.Params.Arguments["project_dir"].(string)
+		store := storeManager.GetStore(dir)
 		argsRaw, _ := json.Marshal(request.Params.Arguments)
 		f := tools.NewPlanChapterTool(store)
 		res, err := f.Execute(ctx, argsRaw)
@@ -144,6 +159,8 @@ func RegisterTools(s *server.MCPServer, store *store.Store) {
 		mcp.WithString("character", mcp.Description("character")),
 		mcp.WithNumber("max_runes", mcp.Description("max_runes")),
 	), func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+		dir, _ := request.Params.Arguments["project_dir"].(string)
+		store := storeManager.GetStore(dir)
 		argsRaw, _ := json.Marshal(request.Params.Arguments)
 		f := tools.NewReadChapterTool(store)
 		res, err := f.Execute(ctx, argsRaw)
@@ -158,6 +175,8 @@ func RegisterTools(s *server.MCPServer, store *store.Store) {
 		mcp.WithNumber("chapters", mcp.Description("chapters")),
 		mcp.WithString("reason", mcp.Description("reason")),
 	), func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+		dir, _ := request.Params.Arguments["project_dir"].(string)
+		store := storeManager.GetStore(dir)
 		argsRaw, _ := json.Marshal(request.Params.Arguments)
 		f := tools.NewReopenBookTool(store)
 		res, err := f.Execute(ctx, argsRaw)
@@ -177,6 +196,8 @@ func RegisterTools(s *server.MCPServer, store *store.Store) {
 		mcp.WithString("character_snapshots", mcp.Description("character_snapshots")),
 		mcp.WithString("style_rules", mcp.Description("style_rules")),
 	), func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+		dir, _ := request.Params.Arguments["project_dir"].(string)
+		store := storeManager.GetStore(dir)
 		argsRaw, _ := json.Marshal(request.Params.Arguments)
 		f := tools.NewSaveArcSummaryTool(store)
 		res, err := f.Execute(ctx, argsRaw)
@@ -194,6 +215,8 @@ func RegisterTools(s *server.MCPServer, store *store.Store) {
 		mcp.WithNumber("volume", mcp.Description("volume")),
 		mcp.WithNumber("arc", mcp.Description("arc")),
 	), func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+		dir, _ := request.Params.Arguments["project_dir"].(string)
+		store := storeManager.GetStore(dir)
 		argsRaw, _ := json.Marshal(request.Params.Arguments)
 		f := tools.NewSaveFoundationTool(store)
 		res, err := f.Execute(ctx, argsRaw)
@@ -210,6 +233,8 @@ func RegisterTools(s *server.MCPServer, store *store.Store) {
 		mcp.WithString("summary", mcp.Description("summary")),
 		mcp.WithString("key_events", mcp.Description("key_events")),
 	), func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+		dir, _ := request.Params.Arguments["project_dir"].(string)
+		store := storeManager.GetStore(dir)
 		argsRaw, _ := json.Marshal(request.Params.Arguments)
 		f := tools.NewSaveVolumeSummaryTool(store)
 		res, err := f.Execute(ctx, argsRaw)
@@ -223,6 +248,8 @@ func RegisterTools(s *server.MCPServer, store *store.Store) {
 		mcp.WithDescription("Executes novel export"),
 		mcp.WithString("output_path", mcp.Description("output_path")),
 	), func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+		dir, _ := request.Params.Arguments["project_dir"].(string)
+		store := storeManager.GetStore(dir)
 		argsRaw, _ := json.Marshal(request.Params.Arguments)
 		f := tools.NewExportTool(store)
 		res, err := f.Execute(ctx, argsRaw)
@@ -236,6 +263,8 @@ func RegisterTools(s *server.MCPServer, store *store.Store) {
 		mcp.WithDescription("Executes novel import"),
 		mcp.WithString("input_path", mcp.Description("input_path")),
 	), func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+		dir, _ := request.Params.Arguments["project_dir"].(string)
+		store := storeManager.GetStore(dir)
 		argsRaw, _ := json.Marshal(request.Params.Arguments)
 		f := tools.NewImportTool(store)
 		res, err := f.Execute(ctx, argsRaw)

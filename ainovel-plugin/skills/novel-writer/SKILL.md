@@ -14,6 +14,8 @@ When the user asks you to write a story or a chapter, **DO NOT jump straight int
 
 **HARD LOCK**: You are STRICTLY FORBIDDEN from moving to the Planning Phase of the next chapter if the current chapter has not been officially committed (using `novel.commit_chapter`). You must wait for user approval and commit the current chapter before proceeding to plan the next one.
 
+**MULTI-PROJECT SUPPORT**: All `novel.*` tools accept an optional `project_dir` parameter. You MUST ALWAYS provide the absolute path of the current workspace/novel directory to this parameter. This ensures you are modifying the correct story when the MCP server handles multiple novels simultaneously. (Extract the workspace path from your system `<user_information>`).
+
 ### Workflow & Tools Usage
 
 1. **Check Status**: 
